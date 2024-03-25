@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React,{useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import firebase  from '@react-native-firebase/app';
 import List from './Components/List';
@@ -18,6 +18,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  ActivityIndicator,
   useColorScheme,
   View,
 } from 'react-native';
@@ -37,7 +38,7 @@ type SectionProps = PropsWithChildren<{
 
 function App(): React.JSX.Element {
 
-
+  const [loading, setLoading] = useState(false);
 
   let app;
   if (firebase.apps.length === 0) {
@@ -46,11 +47,20 @@ function App(): React.JSX.Element {
       app = firebase.app()
   }
   return (
-<SafeAreaView style={{ flex: 1 }}>
-    <View style={{ flex: 1 }}>
-      <List />
-    </View>
-</SafeAreaView>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            {loading ? (
+                    <ActivityIndicator size="large" color="#0000ff" /> 
+                  ) : (
+                    <View style={{ flex: 1 }}>
+                    <List 
+                    loading={loading}
+                    setLoading={setLoading}
+                    />
+                  </View>
+                  )}
+        </View>
+      </SafeAreaView>
 
   );
 }

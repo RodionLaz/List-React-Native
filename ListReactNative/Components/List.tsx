@@ -9,43 +9,56 @@ import {
 } from 'react-native';
 //import { getList, updateList, deleteLast } from './ListFunctions';
 import { UpdateList,GetList,RemoveLast } from '../DBFunctions';
-import { ListItem, TheListProps } from './Types';
+import { ListItem, TheListProps,LoadingProps } from './Types';
 import { TheList, EditableList } from './TheList';
 import * as DB from '../DBFunctions';
 import { endEvent } from 'react-native/Libraries/Performance/Systrace';
 import { update } from 'firebase/database';
 
 
-const List:React.FC = () => {
+
+const List:React.FC<LoadingProps> = ({loading,setLoading}:LoadingProps) => {
   const [editable, setEditable] = useState(false);
   const [data, setData] = useState<ListItem[]>([]);
   const [mainText, setMainText] = useState('');
   const [titleText, setitleText] = useState('');
+  
 
   const handleDelete = async () => {
+    if(editable){
+      return;
+    }
     const newData = data.slice(0, -1);
     await setData(newData);
     RemoveLast();
     console.log("deleted")
+    handleUpdate();
   };
 
   const handleUpdate = async () => {
+    setLoading(true)
     console.log(data)
     setEditable(!editable);
     await UpdateList(data);
     console.log("updated")
+    setLoading(false)
   };
 
-  const handleAddLine = () => {
-    const newLine:ListItem = {
-      _id:'',
-      mainText:"",
-      title:""
-    } 
-    setData([...data,newLine])
-    console.log(data)
-    console.log("Added Line")
-    handleUpdate();
+  const handleAddLine = async () => {
+    try{
+      const newLine:ListItem = {
+        _id:'',
+        mainText:"",
+        title:""
+      } 
+      setData([...data,newLine])
+      console.log(data)
+      console.log("Added Line")
+      await handleUpdate();
+    }catch(e){
+      console.error(e);
+    }
+
   }
   const handleEdit = () => {
     if(editable){
@@ -56,6 +69,7 @@ const List:React.FC = () => {
 
   const handleGetList = async () => {
     try{
+      setLoading(true)
       const listNotSorted = await DB.GetList()
       const list = listNotSorted.map((doc:any) => ({
         _id:doc._id,
@@ -64,15 +78,17 @@ const List:React.FC = () => {
       }))
       setData(list);
       console.log("got list")
+      console.log(data)
     }catch(error){
       console.error(error);
+    }finally{
+      setLoading(false)
     }
-
   };
 
   useEffect(() => {
     //handleGetList();
-    //console.log("started")
+    console.log("started")
   }, []);
 
   return (
