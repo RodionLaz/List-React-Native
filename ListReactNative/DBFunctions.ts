@@ -37,10 +37,10 @@ export const RemoveLast = async () => {
 export const UpdateList = async (newList:ListItem[]) => {
     try{
         newList.forEach(async (item) => {
-            if(item._id.length < 2){
+            if(item.id.length < 2){
                 await AddToList(item.title,item.mainText);
             }else{
-                await collection.doc(item._id).update({
+                await collection.doc(item.id).update({
                     title: item.title,
                     mainText: item.mainText,
                 });
@@ -54,7 +54,14 @@ export const UpdateList = async (newList:ListItem[]) => {
 export const GetList = async () => {
     try {
         const ListSnap = await collection.get();
-        const List = ListSnap.docs.map(doc => doc.data()); 
+        const List: ListItem[] = ListSnap.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id, 
+              title: data.title,
+              mainText: data.mainText
+            };
+          });
         return List;
     } catch (error) {
         console.error("Error: ", error);

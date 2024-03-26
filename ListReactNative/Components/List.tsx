@@ -37,59 +37,51 @@ const List:React.FC<LoadingProps> = ({loading,setLoading}:LoadingProps) => {
 
   const handleUpdate = async () => {
     setLoading(true)
-    console.log(data)
     setEditable(!editable);
+    console.log("data before update : ",data)
     await UpdateList(data);
     console.log("updated")
+    console.log("data after update : ",data)
+    await handleGetList()
     setLoading(false)
   };
-
   const handleAddLine = async () => {
-    try{
-      const newLine:ListItem = {
-        _id:'',
-        mainText:"",
-        title:""
-      } 
-      setData([...data,newLine])
-      console.log(data)
-      console.log("Added Line")
-      await handleUpdate();
-    }catch(e){
-      console.error(e);
+    try {
+      const newLine: ListItem = {
+        id: '',
+        mainText: "",
+        title: ""
+      };
+      setData(prevData => [...prevData, newLine]);
+      console.log("Added Line");
+      handleUpdate(); 
+    } catch (error) {
+      console.error(error);
     }
-
-  }
+  };
   const handleEdit = () => {
     if(editable){
       handleUpdate();
     }
     setEditable(!editable);
   }
+  useEffect(() => {
+    console.log("the data updated : ", data);
+  }, [data]);
 
   const handleGetList = async () => {
-    try{
-      setLoading(true)
-      const listNotSorted = await DB.GetList()
-      const list = listNotSorted.map((doc:any) => ({
-        _id:doc._id,
-        title:doc.title,
-        mainText:doc.MainText,
-      }))
+    try {
+      setLoading(true);
+      const list: ListItem[] = await DB.GetList();
+      console.log("got list", list);
       setData(list);
-      console.log("got list")
-      console.log(data)
-    }catch(error){
+    } catch (error) {
       console.error(error);
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    //handleGetList();
-    console.log("started")
-  }, []);
 
   return (
     <View style={{flex:1,zIndex:1}}>

@@ -1,5 +1,5 @@
 export interface ListItem {
-    _id: string;
+    id: string;
     title: string;
     mainText: string;
 }

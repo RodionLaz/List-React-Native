@@ -13,14 +13,20 @@ import {ListItem,TheListProps} from './Types';
 
 
 export const TheList:React.FC<TheListProps> = ({data}) =>{
-    
-    
+  useEffect(() => {
+    console.log("data got updated in list componnet : ",data)
+
+  },[data])
+  console.log("the data in list componnet : " , data)
     return(
 
         <View>
             <FlatList
           data={data}
           renderItem={({ item }) => {
+            console.log(item.id)
+            console.log(item.title)
+            console.log(item.mainText)
             return (
               <View style={{ marginBottom: 5 }}>
                 <Text style={{ fontSize: 40 }}>{`\u2022 ${item.title}`}</Text>
@@ -42,6 +48,7 @@ export const EditableList:React.FC<TheListProps> = ({data,setData}:TheListProps)
           data={data}
           renderItem={({ item,index }) => {
             return (
+
               <View style={{ marginBottom: 5 }}>
                 <TextInput
                     style={{fontSize: 40,flex:1}}
